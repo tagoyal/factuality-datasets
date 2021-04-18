@@ -42,3 +42,36 @@ python3 train.py \
     --learning_rate 2e-5 \
     --output_dir $MODEL_DIR
 ```
+
+### Running pretrained factuality models
+To run the trained factuality model on the preprocessed dev files (like the 'factuality_models_datasets/training_datasets/XSUM-human/test.tsv') files, simply run the following code (you may need to change the name from test.tsv to dev.tsv). This will generate a dev_out.txt file with predicted factuality labels at both the arc-level and the sentence-level. 
+
+```
+python3 train.py \
+    --model_type $MODEL_TYPE \
+    --model_name_or_path google/electra-base-discriminator \
+    --input_dir $MODEL_DIR \
+    --do_eval \
+    --train_data_file=$DATA_DIR/train.tsv \
+    --eval_data_file=$DATA_DIR/dev.tsv  \
+    --per_gpu_eval_batch_size=8   \
+    --output_dir $MODEL_DIR
+```
+
+
+To run the trained factuality model on non-preprocessed (input, summary) pairs, i.e., those which have not been dependency parsed, run the following code. This will output the predicted factuality labels at both the arc-level and the sentence-level. This code only works for model types 'electra_dae' and 'electra_dae_weak'.
+```
+python3 evaluate_generated_outputs.py \
+        --model_type electra_dae \
+        --model_dir $MODEL_DIR  \
+        --input_file sample_test.txt
+```
+This expects an input file with the following format (see sample_test.txt for reference)
+```
+article1
+summary1
+[empty line]
+article2
+summary2
+[empty line]
+```
