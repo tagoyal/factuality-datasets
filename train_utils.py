@@ -6,11 +6,9 @@ import csv
 from torch.utils.data import TensorDataset
 from transformers.modeling_electra import ElectraPreTrainedModel, ElectraModel
 from torch.nn import CrossEntropyLoss
+from pycorenlp import StanfordCoreNLP
 
 logger = logging.getLogger(__name__)
-import sys
-import train_utils
-sys.modules['train_dae_constrained_utils'] = train_utils
 
 
 def _read_tsv(input_file, quoting=csv.QUOTE_MINIMAL):
@@ -40,6 +38,86 @@ def pad_1d(input, max_length, pad_token):
         padding_length = 0
     input = input + ([pad_token] * padding_length)
     return input
+
+
+def get_relevant_deps_and_context(line, nlp):
+    dep_type = 'enhancedDependencies'
+    ignore_dep = ['punct', 'ROOT', 'root', 'det', 'case', 'aux', 'auxpass', 'dep', 'cop', 'mark']
+
+    parse = nlp.annotate(line, properties={'annotators': 'tokenize,ssplit,pos,depparse', 'outputFormat': 'json',
+                                           'ssplit.isOneSentence': True})
+    deps = []
+    tokens = parse['sentences'][0]['tokens']
+    pos = [tok['pos'] for tok in tokens]
+    tokens = [tok['word'] for tok in tokens]
+
+    for dep_dict in parse['sentences'][0][dep_type]:
+
+        if dep_dict['dep'] not in ignore_dep:
+            dep_temp = {'dep': dep_dict['dep']}
+            dep_temp.update({'child': dep_dict['dependentGloss'], 'child_idx': dep_dict['dependent']})
+            dep_temp.update({'head': dep_dict['governorGloss'], 'head_idx': dep_dict['governor']})
+            deps.append(dep_temp)
+    return tokens, pos, deps
+
+
+def get_tokenized_text(input_text, nlp):
+    tokenized_json = nlp.annotate(input_text, properties={'annotators': 'tokenize', 'outputFormat': 'json',
+                                                          'ssplit.isOneSentence': True})
+    tokenized_text = []
+    for tok in tokenized_json['tokens']:
+        tokenized_text.append(tok['word'])
+    tokenized_text = ' '.join(tokenized_text)
+    return tokenized_text
+
+
+def get_single_features(decode_text, input_text, tokenizer, nlp, args):
+    inp_tok, inp_pos, input_dep = get_relevant_deps_and_context(decode_text, nlp)
+    tokenized_text = get_tokenized_text(input_text, nlp)
+
+    ex = {'input': tokenized_text, 'deps': [], 'context': ' '.join(inp_tok), 'sentlabel': 1}
+    for dep in input_dep:
+        ex['deps'].append({'dep': dep['dep'], 'label': 1,
+                           'head_idx': dep['head_idx'] - 1, 'child_idx': dep['child_idx'] - 1,
+                           'child': dep['child'], 'head': dep['head']})
+
+    dict_temp = {'id': 0, 'input': ex['input'], 'sentlabel': ex['sentlabel'], 'context': ex['context']}
+    for i in range(20):
+        if i < len(ex['deps']):
+            dep = ex['deps'][i]
+            dict_temp['dep_idx' + str(i)] = str(dep['child_idx']) + ' ' + str(dep['head_idx'])
+            dict_temp['dep_words' + str(i)] = str(dep['child']) + ' ' + str(dep['head'])
+            dict_temp['dep' + str(i)] = dep['dep']
+            dict_temp['dep_label' + str(i)] = dep['label']
+        else:
+            dict_temp['dep_idx' + str(i)] = ''
+            dict_temp['dep_words' + str(i)] = ''
+            dict_temp['dep' + str(i)] = ''
+            dict_temp['dep_label' + str(i)] = ''
+
+    features = convert_examples_to_features(
+        [dict_temp],
+        tokenizer,
+        max_length=args.max_seq_length,
+        pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0])
+
+    all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    input_attention_mask = torch.tensor([f.input_attention_mask for f in features], dtype=torch.long)
+
+    child_indices = torch.tensor([f.child_indices for f in features], dtype=torch.long)
+    head_indices = torch.tensor([f.head_indices for f in features], dtype=torch.long)
+
+    mask_entail = torch.tensor([f.mask_entail for f in features], dtype=torch.long)
+    mask_cont = torch.tensor([f.mask_cont for f in features], dtype=torch.long)
+    num_dependencies = torch.tensor([f.num_dependencies for f in features], dtype=torch.long)
+    arcs = torch.tensor([f.arcs for f in features], dtype=torch.long)
+
+    sentence_label = torch.tensor([f.sentence_label for f in features], dtype=torch.long)
+
+    dataset = TensorDataset(all_input_ids, input_attention_mask, child_indices, head_indices,
+                            mask_entail, mask_cont, num_dependencies, arcs, sentence_label)
+
+    return dataset
 
 
 class ElectraBasicModel(ElectraPreTrainedModel):
