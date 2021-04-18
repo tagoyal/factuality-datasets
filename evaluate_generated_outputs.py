@@ -5,6 +5,7 @@ import torch
 import numpy as np
 from train_utils import get_single_features
 import argparse
+from sklearn.utils.extmath import softmax
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_type", type=str, required=True)
@@ -64,23 +65,32 @@ def evaluate_summary(article_data, summary, tokenizer, model, nlp, args):
         input_full = tokenizer.convert_ids_to_tokens(input_ids[0], skip_special_tokens=False)
         input_full = ' '.join(input_full).replace('[PAD]', '').strip()
 
-        summary = input_full.split('[SEP]')[1].strip().split(' ')
+        summary = input_full.split('[SEP]')[1].strip()
 
-        print(f'Input Article:\t{summary}')
+        print(f'Input Article:\t{input_full}')
         print(f'Generated summary:\t{summary}')
 
-        for j, arc in enumerate(arcs):
+        num_negative = 0.
+        for j, arc in enumerate(arcs[0]):
             arc_text = tokenizer.decode(arc)
             arc_text = arc_text.replace(tokenizer.pad_token, '').strip()
 
             if arc_text == '':  # for bert
                 break
 
-            pred = np.argmax(dep_outputs[j])
+            softmax_probs = softmax([dep_outputs[j]])
+            pred = np.argmax(softmax_probs[0])
+            if pred == 0:
+                num_negative += 1
             print(f'Arc:\t{arc_text}')
-            print(f'Pred Arc Label:\t{pred}')
+            print(f'Pred:\t{pred}')
+            print(f'Probs:\t0={softmax_probs[0][0]}\t1={softmax_probs[0][1]}')
 
         print('\n')
+        if num_negative > 0:
+            print(f'Sent-level pred:\t0\n\n')
+        else:
+            print(f'Sent-level pred:\t1\n\n')
 
 
 if __name__ == '__main__':
@@ -107,4 +117,6 @@ if __name__ == '__main__':
     for idx in range(0, len(input_data), 3):
         article_text = input_data[idx]
         summary = input_data[idx + 1]
+        print(article_text)
+        print(summary)
         evaluate_summary(article_text, summary, tokenizer, model, nlp, args)
