@@ -1,6 +1,6 @@
 # factuality-datasets
 
-Contains code and dataset from the paper <a href="https://arxiv.org/pdf/2104.04302.pdf"> Aligning Datasets and Models for Evaluating Factuality in Generation </a> Tanya Goyal and Greg Durrett, NAACL 2021.  
+Contains code and dataset from the paper <a href="https://arxiv.org/pdf/2104.04302.pdf"> Annotating and Modeling Fine-grained Factuality in Summarization </a> Tanya Goyal and Greg Durrett, NAACL 2021.  
 
 Environment base is Python 3.6. Also see requirements.txt. We used Stanford CoreNLP version 3.9.1.
 
