@@ -75,3 +75,10 @@ article2
 summary2
 [empty line]
 ```
+
+EDIT:
+For running models on non-preprocessed data, the input file needs to be preprecessed in the following way:
+1. Run both input article and summary through PTB tokenizer. 
+2. Lower case both input article and summary. 
+
+The models expect input of the above form. Not pre-processing it appropriately will hurt model performance. 
