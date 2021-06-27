@@ -1,8 +1,9 @@
 import csv
 
-input_file = open('../other_datasets/xsum/bart/train-for-constrained/dev_out.txt')
+input_file = open('$INPUT_FOLDER/dev_out.txt')
 
-output_file = open('../other_datasets/xsum/bart/train.tsv', 'w')
+output_file = open('$OUTPUT_FOLDER/filename.tsv', 'w')
+
 fieldnames = ['input', 'output', 'output_ids']
 writer = csv.DictWriter(output_file, fieldnames=fieldnames, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
 writer.writeheader()

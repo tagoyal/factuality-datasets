@@ -294,14 +294,14 @@ def main():
         "--eval_data_file",
         default=None,
         type=str,
-        required=True,
+        required=False,
         help="Evaluation data file to evaluate the perplexity on (a text file).",
     )
     parser.add_argument(
         "--train_data_file",
         default=None,
         type=str,
-        required=True,
+        required=False,
         help="The input training data file (a text file)."
     )
 
@@ -316,23 +316,13 @@ def main():
     parser.add_argument("--do_eval", action="store_true", help="Whether to run eval on the dev set.")
     parser.add_argument("--per_gpu_train_batch_size", default=32, type=int, help="Batch size training.", )
     parser.add_argument("--per_gpu_eval_batch_size", default=32, type=int, help="Batch size evaluation.", )
-    parser.add_argument(
-        "--gradient_accumulation_steps",
-        type=int,
-        default=1,
-        help="Number of updates steps to accumulate before performing a backward/update pass.",
-    )
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=1, help="No. steps before backward pass.",)
     parser.add_argument("--learning_rate", default=2e-5, type=float, help="The initial learning rate for Adam.")
     parser.add_argument("--weight_decay", default=0.0, type=float, help="Weight decay if we apply some.")
     parser.add_argument("--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer.")
     parser.add_argument("--max_grad_norm", default=1.0, type=float, help="Max gradient norm.")
     parser.add_argument("--num_train_epochs", default=3.0, type=float, help="Total number of training epochs", )
-    parser.add_argument(
-        "--max_steps",
-        default=-1,
-        type=int,
-        help="If > 0: set total number of training steps to perform. Override num_train_epochs.",
-    )
+    parser.add_argument("--max_steps", default=-1, type=int, help="If>0: no. train steps. Overrides num_train_epochs.",)
     parser.add_argument("--gpu_device", type=int, default=0, help="gpu device")
     parser.add_argument("--warmup_steps", default=0, type=int, help="Linear warmup over warmup_steps.")
     parser.add_argument("--save_steps", type=int, default=10, help="Save checkpoint every X updates steps.")
