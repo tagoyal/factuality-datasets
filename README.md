@@ -1,6 +1,6 @@
 # factuality-datasets
 
-Contains code and dataset from the paper <a href="https://arxiv.org/pdf/2104.04302.pdf"> Aligning Datasets and Models for Evaluating Factuality in Generation </a> Tanya Goyal and Greg Durrett, NAACL 2021.  
+Contains code and dataset from the paper <a href="https://arxiv.org/pdf/2104.04302.pdf"> Annotating and Modeling Fine-grained Factuality in Summarization </a> Tanya Goyal and Greg Durrett, NAACL 2021.  
 
 Environment base is Python 3.6. Also see requirements.txt. We used Stanford CoreNLP version 3.9.1.
 
@@ -75,3 +75,10 @@ article2
 summary2
 [empty line]
 ```
+
+EDIT:
+For running models on non-preprocessed data, the input file needs to be preprecessed in the following way:
+1. Run both input article and summary through PTB tokenizer. 
+2. Lower case both input article and summary. 
+
+The models expect input of the above form. Not pre-processing it appropriately will hurt model performance. 
