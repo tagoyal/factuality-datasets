@@ -19,45 +19,6 @@ def shift_tokens_left(input_ids, pad_token_id):
     return prev_output_tokens
 
 
-class BartEditor(PretrainedBartModel):
-    base_model_prefix = "model"
-
-    def __init__(self, config):
-        super(BartEditor, self).__init__(config)
-        self.model = BartForConditionalGeneration(config)
-        self.criterion = torch.nn.CrossEntropyLoss(ignore_index=config.pad_token_id)
-        self.pad_token_id = config.pad_token_id
-
-        self.init_weights()
-
-    def forward(self, input_ids, attention_mask, decoder_input_ids, decoder_attention_mask, lm_labels, generate):
-        transformer_outputs = self.model(input_ids, attention_mask=attention_mask, decoder_input_ids=decoder_input_ids)
-        decoder_ids_shifted = shift_tokens_left(decoder_input_ids, self.pad_token_id)
-
-        outputs = transformer_outputs[0]
-
-        loss = self.criterion(outputs.contiguous().view(-1, outputs.size(-1)),
-                              decoder_ids_shifted.contiguous().view(-1))
-
-        outputs_return = (outputs,)
-        outputs_return = (loss,) + outputs_return
-
-        return outputs_return
-
-
-class GPT2Editor(GPT2PreTrainedModel):
-    base_model_prefix = "model"
-
-    def __init__(self, config):
-        super(GPT2Editor, self).__init__(config)
-        self.model = GPT2LMHeadModel(config)
-
-        self.init_weights()
-
-    def forward(self, input_ids, attention, labels):
-        return self.model(input_ids, attention_mask=attention, labels=labels)
-
-
 def _read_tsv(input_file, quoting=csv.QUOTE_MINIMAL):
     """Reads a tab separated value file."""
     with open(input_file, "r", encoding="utf-8-sig") as f:
@@ -69,12 +30,10 @@ def _read_tsv(input_file, quoting=csv.QUOTE_MINIMAL):
 
 
 def get_train_examples(data_dir):
-    """See base class."""
     return _read_tsv(os.path.join(data_dir, "train.tsv"))
 
 
 def get_dev_examples(data_dir):
-    """See base class."""
     return _read_tsv(os.path.join(data_dir, "dev.tsv"))
 
 

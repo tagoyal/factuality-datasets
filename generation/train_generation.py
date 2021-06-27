@@ -7,17 +7,14 @@ import random
 from typing import Dict, List, Tuple
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
-from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from tqdm import tqdm, trange
 import train_generation_utils
-from torch import nn
 
 
 from transformers import (
     AdamW,
     BartConfig,
-    BartForConditionalGeneration,
     BartTokenizer,
     PreTrainedModel,
     PreTrainedTokenizer,
@@ -27,8 +24,8 @@ from transformers import (
 
 logger = logging.getLogger(__name__)
 
-MODEL_CLASSES = {"bart": (BartConfig, BartForConditionalGeneration, BartTokenizer),
-                 "bart_partial": (BartConfig, train_generation_utils.BartForConditionalGenerationCustom, BartTokenizer),}
+MODEL_CLASSES = {"bart_partial": (BartConfig, train_generation_utils.BartForConditionalGenerationCustom,
+                                  BartTokenizer),}
 
 
 def set_seed(args):
