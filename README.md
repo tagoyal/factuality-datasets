@@ -5,7 +5,7 @@ Contains code and dataset from the paper <a href="https://arxiv.org/pdf/2104.043
 Environment base is Python 3.6. Also see requirements.txt. We used Stanford CoreNLP version 3.9.1.
 
 # Models and Data
-All models and datasets are available at: https://drive.google.com/drive/folders/18X9l3E1MWOFtLOMJNhlS8DEFDz4lsZuq?usp=sharing
+All models and datasets are available at: https://drive.google.com/drive/folders/1kcRCU-UlIqwDIGsaRQlRsCcHY4Mc-m3L?usp=sharing
 
 ## Manually Annotationed Error Types
 Manually evaluated error type annotation for generated summaries from XSum and CNN/DM is included in the 'annotated_datasets' folder.
