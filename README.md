@@ -1,8 +1,23 @@
-# factuality-datasets
+# Annotating and Modeling Fine-grained Factuality in Summarization
 
 Contains code and dataset from the paper <a href="https://arxiv.org/pdf/2104.04302.pdf"> Annotating and Modeling Fine-grained Factuality in Summarization </a> Tanya Goyal and Greg Durrett, NAACL 2021.  
 
-Environment base is Python 3.6. Also see requirements.txt. We used Stanford CoreNLP version 3.9.1.
+```
+@inproceedings{goyal2021annotating,
+  title={Annotating and Modeling Fine-grained Factuality in Summarization},
+  author={Goyal, Tanya and Durrett, Greg},
+  booktitle={Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies},
+  year={2021}
+}
+```
+
+# Dependency Arc Entailment (DAE)
+
+The DAE formulation decomposes the summary-level factuality task in smaller entailment tasks at the arc-level. Given the input article, the DAE model is trained to independantly predict whether the relationship implied by each independant dependency arc is entailed by the input or not. 
+
+<img width="382" alt="Screen Shot 2022-11-29 at 1 49 32 AM" src="https://user-images.githubusercontent.com/22390810/204469849-dd016288-4920-4363-801f-543a15ac8261.png">
+
+In the above example, the arc woman -> Chicago is non-factual because the woman is travelling to Chicago but not necessarily from Chicago.
 
 # Models and Data
 All models and datasets are available at: https://drive.google.com/drive/folders/1kcRCU-UlIqwDIGsaRQlRsCcHY4Mc-m3L?usp=sharing
@@ -11,6 +26,9 @@ All models and datasets are available at: https://drive.google.com/drive/folders
 Manually evaluated error type annotation for generated summaries from XSum and CNN/DM is included in the 'annotated_datasets' folder.
 
 ## Factuality Models and Data
+
+Environment base is Python 3.6. Also see requirements.txt. We used Stanford CoreNLP version 3.9.1.
+
 The drive folder contains synthetic datasets (both generation-based and entity-based) used to train factuality models for both CNN/DM and XSum domain. These are in the 'factuality_models_datasets/training_datasets' folder. 
 
 'factuality_models_datasets/training_datasets/XSUM-human': For XSum, additionally, the human-annotated training and test set (original data provided in <a href="https://arxiv.org/abs/2005.00661">this paper </a>) is included along with the train test splits used our paper. The corresponding tsv files contain input, summary pairs, the sentence-level factuality label as well as the arc-level factuality labels derived from the span-level annotation provided by the original paper. These files can be used directly (no further preprocessing) to train factuality models. Use train.tsv to train DAE and sentence-level models, and train_weak.tsv to train DAE-Weak model.
