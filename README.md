@@ -17,7 +17,7 @@ The DAE formulation decomposes the summary-level factuality task in smaller enta
 
 <img width="382" alt="Screen Shot 2022-11-29 at 1 49 32 AM" src="https://user-images.githubusercontent.com/22390810/204469849-dd016288-4920-4363-801f-543a15ac8261.png">
 
-In the above example, the arc woman -> Chicago is non-factual because the woman is travelling to Chicago but not necessarily from Chicago.
+In the above example, the arc woman -> Chicago is non-factual because the woman is travelling to Chicago but not necessarily from Chicago. All other arcs in the summary are factual according to the DAE formulation
 
 # Models and Data
 All models and datasets are available at: https://drive.google.com/drive/folders/1kcRCU-UlIqwDIGsaRQlRsCcHY4Mc-m3L?usp=sharing
