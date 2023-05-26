@@ -100,3 +100,8 @@ For running models on non-preprocessed data, the input file needs to be preprece
 2. Lower case both input article and summary. 
 
 The models expect input of the above form. Not pre-processing it appropriately will hurt model performance. 
+
+### Running pretrained model for evaluation using docker.
+For the case of running a pretrained model to evaluate some summaries we also provide a docker pipeline which handles the setup of the corenlp-server, python and libraries (requirements.txt) in the right versions and the needed preprocessing.
+The model download is not handled automatically for now. You have to manually download it (and unzip if needed) and adjust the path in the Dockerfile that copies the model into the container (or name it accordingly).
+The example contains a comment on how to inject your data of interest into the container.
